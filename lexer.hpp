@@ -7,6 +7,7 @@ class Lexer
 public:
     Lexer(const char *str)
     {
+        /* need to add eof check and a stream */
         stream = str;
         while ((*stream) != '\0')
         {
@@ -41,16 +42,19 @@ public:
             }
         }
     }
+    /* removes the top token */
     void consume()
     {
 
         tokList.pop();
     }
+    /* peek the top token */
     Token peek()
     {
 
         return tokList.front();
     }
+    /* returns if the tokens are empty */
     bool empty()
     {
         return tokList.empty();
@@ -58,15 +62,18 @@ public:
 
 private:
     void parse() {}
+    /* is a given char a digit */
     bool is_digit(char c)
     {
         return ('0' <= c) && (c <= '9');
     }
+    /* is a given char in the set of starter id */
     bool is_id(char c)
     {
         return (
             (('a' <= c) && (c <= 'z')) || (('A' <= c) && (c <= 'Z')) || (c == '_'));
     }
+    /* if a given char a space  */
     bool is_space(char c)
     {
         switch (c)
@@ -83,7 +90,7 @@ private:
             return false;
         }
     }
-
+    /* if a given char a op */
     bool is_op(char c)
     {
         switch (c)
@@ -118,14 +125,17 @@ private:
             return false;
         }
     }
+    /* is this a single quote */
     bool is_char()
     {
         return *stream == '\'';
     }
+    /* is this a double quote */
     bool is_str()
     {
         return *stream == '"' || *stream == '\"';
     }
+    /* get the char for the single quoutes */
     Token get_char()
     {
         int size;
@@ -144,6 +154,8 @@ private:
         stream += size + 2;
         return tk;
     }
+    /* get the string  for the double quoutes */
+
     Token get_str()
     {
         const char *start = stream;
@@ -157,6 +169,7 @@ private:
         stream += size + 2;
         return tk;
     }
+    /*  */
     Token get_number()
     {
         const char *start = stream;
@@ -172,6 +185,8 @@ private:
 
         return tk;
     }
+    /* convert the stream into an id *no safety* */
+
     Token get_id()
     {
         const char *start = stream;
@@ -185,6 +200,7 @@ private:
         stream += size;
         return tk;
     }
+    /* convert the stream into an operator *no safety* */
     Token get_op()
     {
         Token::Kind tok;
