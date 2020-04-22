@@ -1,7 +1,15 @@
+
 #include "Token.hpp"
 #include <queue>
 #include <string>
+#include <cstring>
 #include <assert.h>
+// TODO state all assumptions
+// TODO finalize behaviour
+// TODO test for nested strings/ quotes """"""
+#ifndef __CPP_LEXER_H_
+#define __CPP_LEXER_H_
+
 class Lexer
 {
 public:
@@ -13,7 +21,15 @@ public:
         {
             if (is_id(*stream))
             {
-                tokList.push(get_id());
+                if (is_keyword())
+                {
+                    tokList.push(get_keyword());
+                }
+                else
+                {
+
+                    tokList.push(get_id());
+                }
             }
             else if (is_digit(*stream))
             {
@@ -45,7 +61,6 @@ public:
     /* removes the top token */
     void consume()
     {
-
         tokList.pop();
     }
     /* peek the top token */
@@ -62,6 +77,11 @@ public:
 
 private:
     void parse() {}
+
+    bool is_keyword()
+    {
+        return get_keyword_size() != 0;
+    }
     /* is a given char a digit */
     bool is_digit(char c)
     {
@@ -125,6 +145,7 @@ private:
             return false;
         }
     }
+
     /* is this a single quote */
     bool is_char()
     {
@@ -150,7 +171,7 @@ private:
         }
 
         // assert(size < 5 && size > 2);
-        Token tk = Token(Token::Kind::Char, std::string(stream + 1, size));
+        Token tk = Token(Token::Toktype::Char, std::string(stream + 1, size));
         stream += size + 2;
         return tk;
     }
@@ -165,29 +186,61 @@ private:
         }
 
         int size = (start - stream);
-        Token tk = Token(Token::Kind::String, std::string(stream + 1, size));
+        Token tk = Token(Token::Toktype::String, std::string(stream + 1, size));
         stream += size + 2;
         return tk;
     }
-    /*  */
+    /*  get a number*/
     Token get_number()
     {
         const char *start = stream;
-
+        int size;
+        Token tk;
         while (is_digit(*start))
         {
             start++;
         }
-        int size = start - stream;
 
-        Token tk = Token(Token::Kind::Number, std::string(stream, size));
+        if (*start == '.')
+        {
+            start++;
+
+            while (is_digit(*start))
+            {
+                start++;
+            }
+            size = start - stream;
+            tk = Token(Token::Toktype::Float, std::string(stream, size));
+        }
+        else
+        {
+            tk = Token(Token::Toktype::Number, std::string(stream, size));
+        }
+
+        size = start - stream;
+
         stream += size;
 
         return tk;
     }
-    /* convert the stream into an id *no safety* */
+    /* get the size of the keyword*/
+    int get_keyword_size()
+    {
+        for (auto str : keywords)
+        {
+            if (!strncmp(str, stream, strlen(str)))
+            {
+                char next_char = *(str + strlen(str));
+                if (!is_id(next_char) && !is_digit(next_char))
+                {
+                    return strlen(str);
+                }
+            }
+        }
+        return 0;
+    }
 
-    Token get_id()
+    int get_id_size()
     {
         const char *start = stream;
 
@@ -195,91 +248,108 @@ private:
         {
             start++;
         }
-        int size = start - stream;
-        Token tk = Token(Token::Kind::Identifer, std::string(stream, size));
+        return start - stream;
+    }
+    Token get_keyword()
+    {
+        int size = get_keyword_size();
+        Token tk = Token(Token::Toktype::Keyword, std::string(stream, size));
+        stream += size;
+        return tk;
+    }
+
+    /* convert the stream into an id *no safety* */
+    Token get_id()
+    {
+
+        int size = get_id_size();
+        Token tk = Token(Token::Toktype::Identifer, std::string(stream, size));
         stream += size;
         return tk;
     }
     /* convert the stream into an operator *no safety* */
     Token get_op()
     {
-        Token::Kind tok;
+        Token::Toktype tok;
         switch (*stream)
         {
         case '(':
-            tok = Token::Kind::LeftParen;
+            tok = Token::Toktype::LeftParen;
             break;
         case ')':
-            tok = Token::Kind::RightParen;
+            tok = Token::Toktype::RightParen;
             break;
         case '{':
-            tok = Token::Kind::LeftCurly;
+            tok = Token::Toktype::LeftCurly;
             break;
         case '}':
-            tok = Token::Kind::RightCurly;
+            tok = Token::Toktype::RightCurly;
             break;
         case '[':
-            tok = Token::Kind::RightSquare;
+            tok = Token::Toktype::RightSquare;
             break;
         case ']':
-            tok = Token::Kind::LeftSquare;
+            tok = Token::Toktype::LeftSquare;
             break;
         case '*':
-            tok = Token::Kind::Star;
+            tok = Token::Toktype::Star;
             break;
         case '/':
-            tok = Token::Kind::Div;
+            tok = Token::Toktype::Div;
             break;
         case '-':
-            tok = Token::Kind::Minus;
+            tok = Token::Toktype::Minus;
             break;
         case '+':
-            tok = Token::Kind::Plus;
+            tok = Token::Toktype::Plus;
             break;
         case '.':
-            tok = Token::Kind::Dot;
+            tok = Token::Toktype::Dot;
             break;
         case '%':
-            tok = Token::Kind::Mod;
+            tok = Token::Toktype::Mod;
             break;
         case '&':
-            tok = Token::Kind::Amp;
+            tok = Token::Toktype::Amp;
             break;
         case '!':
-            tok = Token::Kind::Not;
+            tok = Token::Toktype::Not;
             break;
         case '|':
-            tok = Token::Kind::Line;
+            tok = Token::Toktype::Line;
             break;
         case '?':
-            tok = Token::Kind::Question;
+            tok = Token::Toktype::Question;
             break;
         case ':':
-            tok = Token::Kind::Colon;
+            tok = Token::Toktype::Colon;
             break;
         case ';':
-            tok = Token::Kind::Colon;
+            tok = Token::Toktype::Colon;
             break;
         case '^':
-            tok = Token::Kind::Caret;
+            tok = Token::Toktype::Caret;
             break;
         case '=':
-            tok = Token::Kind::Equals;
+            tok = Token::Toktype::Equals;
             break;
         case '#':
-            tok = Token::Kind::Hash;
+            tok = Token::Toktype::Hash;
             break;
         case '~':
-            tok = Token::Kind::Squiggly;
+            tok = Token::Toktype::Squiggly;
             break;
         case '<':
-            tok = Token::Kind::LessThan;
+            tok = Token::Toktype::LessThan;
             break;
         case '>':
-            tok = Token::Kind::GreaterThan;
+            tok = Token::Toktype::GreaterThan;
+            break;
+        case ',':
+            tok = Token::Toktype::Comma;
             break;
         default:
-            tok = Token::Kind::NO_VAL;
+            tok = Token::Toktype::NO_VAL;
         }
         stream++;
         return tok;
@@ -288,3 +358,4 @@ private:
     const char *stream;
     std::queue<Token> tokList;
 };
+#endif
