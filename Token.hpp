@@ -2,14 +2,82 @@
 #include <iostream>
 #ifndef __CPP_Token_H_
 #define __CPP_Token_H_
+// TODO if out if this is the right way ??
+const constexpr char *const keywords[] = {
+    "asm",
+    "else",
+    "new",
+    "this",
+    "auto",
+    "enum",
+    "operator",
+    "throw",
+    "bool",
+    "explicit",
+    "private",
+    "true",
+    "break",
+    "export",
+    "protected",
+    "try",
+    "case",
+    "extern",
+    "public",
+    "typedef",
+    "catch",
+    "false",
+    "register",
+    "typeid",
+    "char",
+    "float",
+    "reinterpret_cast",
+    "typename",
+    "class",
+    "for",
+    "return",
+    "union",
+    "const",
+    "friend",
+    "short",
+    "unsigned",
+    "const_cast",
+    "goto",
+    "signed",
+    "using",
+    "continue",
+    "if",
+    "sizeof",
+    "virtual",
+    "default",
+    "inline",
+    "static",
+    "void",
+    "delete",
+    "int",
+    "static_cast",
+    "volatile",
+    "do",
+    "long",
+    "struct",
+    "wchar_t",
+    "double",
+    "mutable",
+    "switch",
+    "while",
+    "dynamic_cast",
+    "namespace",
+    "template",
 
+};
 class Token
 {
 public:
-    enum class Kind
+    enum class Toktype
     {
         Number,
+        Float,
         Identifer,
+        Keyword,
         String,
         Char,
         LeftParen,
@@ -45,98 +113,106 @@ public:
         NO_VAL,
 
     };
-    Kind type;
+    Toktype type;
     std::string value;
-    Token(Kind kind, std::string val)
+    Token(Toktype kind, std::string val)
     {
         type = kind;
         value = val;
     }
     Token()
     {
-        type = Kind::NO_VAL;
+        type = Toktype::NO_VAL;
         value = "";
     }
-    Token(Kind kind)
+    Token(Toktype kind)
     {
         type = kind;
         value = "";
     }
+    Toktype getType()
+    {
+        return type;
+    }
 };
 
-inline std::string to_string(Token::Kind kind)
+inline std::string to_string(Token::Toktype kind)
 {
     switch (kind)
     {
-    case Token::Kind::Number:;
+    case Token::Toktype::Number:;
         return "Number";
-    case Token::Kind::Identifer:
+    case Token::Toktype::Keyword:;
+        return "Keyword";
+    case Token::Toktype::Identifer:
         return "Identifer";
-    case Token::Kind::String:
+    case Token::Toktype::String:
         return "String";
-    case Token::Kind::LeftParen:
+    case Token::Toktype::Float:
+        return "Float";
+    case Token::Toktype::LeftParen:
         return "LeftParen";
-    case Token::Kind::RightParen:
+    case Token::Toktype::RightParen:
         return "RightParen";
-    case Token::Kind::Char:
+    case Token::Toktype::Char:
         return "Char";
-    case Token::Kind::LeftSquare:
+    case Token::Toktype::LeftSquare:
         return "LeftSquare";
-    case Token::Kind::RightSquare:
+    case Token::Toktype::RightSquare:
         return "RightSquare";
-    case Token::Kind::LeftCurly:
+    case Token::Toktype::LeftCurly:
         return "LeftCurly";
-    case Token::Kind::RightCurly:
+    case Token::Toktype::RightCurly:
         return "RightCurly";
-    case Token::Kind::LessThan:
+    case Token::Toktype::LessThan:
         return "LessThan";
-    case Token::Kind::Squiggly:
+    case Token::Toktype::Squiggly:
         return "Squiggly";
-    case Token::Kind::GreaterThan:
+    case Token::Toktype::GreaterThan:
         return "GreaterThan";
-    case Token::Kind::Semicolon:
+    case Token::Toktype::Semicolon:
         return "Semicolon";
-    case Token::Kind::Caret:
+    case Token::Toktype::Caret:
         return "Caret";
-    case Token::Kind::Not:
+    case Token::Toktype::Not:
         return "Not";
-    case Token::Kind::Equals:
+    case Token::Toktype::Equals:
         return "Equals";
-    case Token::Kind::Question:
+    case Token::Toktype::Question:
         return "Question";
-    case Token::Kind::SingleQuote:
+    case Token::Toktype::SingleQuote:
         return "SingleQuote";
-    case Token::Kind::FordSlash:
+    case Token::Toktype::FordSlash:
         return "FordSlash";
-    case Token::Kind::BackSlash:
+    case Token::Toktype::BackSlash:
         return "BackSlash";
-    case Token::Kind::Comma:
+    case Token::Toktype::Comma:
         return "Comma";
-    case Token::Kind::DoubleQuote:
+    case Token::Toktype::DoubleQuote:
         return "DoubleQuote";
-    case Token::Kind::Colon:
+    case Token::Toktype::Colon:
         return "Colon";
-    case Token::Kind::Hash:
+    case Token::Toktype::Hash:
         return "Hash";
-    case Token::Kind::Plus:
+    case Token::Toktype::Plus:
         return "Plus";
-    case Token::Kind::Minus:
+    case Token::Toktype::Minus:
         return "Minus";
-    case Token::Kind::Div:
+    case Token::Toktype::Div:
         return "Div";
-    case Token::Kind::Star:
+    case Token::Toktype::Star:
         return "Star";
-    case Token::Kind::Mod:
+    case Token::Toktype::Mod:
         return "Mod";
-    case Token::Kind::Amp:
+    case Token::Toktype::Amp:
         return "Amp";
-    case Token::Kind::Line:
+    case Token::Toktype::Line:
         return "Line";
-    case Token::Kind::Dot:
+    case Token::Toktype::Dot:
         return "Dot";
-    case Token::Kind::End:
+    case Token::Toktype::End:
         return "End";
-    case Token::Kind::NO_VAL:
+    case Token::Toktype::NO_VAL:
         return "NO_VAL";
     default:
         return "OUT OF BOUNDS TOKEN???";
